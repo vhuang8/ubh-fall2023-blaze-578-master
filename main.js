@@ -28,26 +28,34 @@
      for (let i = 0; i < maxPredictions; i++) { // and class labels
          labelContainer.appendChild(document.createElement("div"));
      }
- }x
+ }
 
  async function loop(timestamp) {
      webcam.update(); // update the webcam frame
      await predict();
      window.requestAnimationFrame(loop);
  }
-
+ var x = document.getElementById("audiooo");
  async function predict() {
      // Prediction #1: run input through posenet
      // estimatePose can take in an image, video or canvas html element
-     const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
+    const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
      // Prediction 2: run input through teachable machine classification model
-     const prediction = await model.predict(posenetOutput);
-
-     for (let i = 0; i < maxPredictions; i++) {
-         const classPrediction =
-             prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-         labelContainer.childNodes[i].innerHTML = classPrediction;
-     }
+    const prediction = await model.predictTopK(posenetOutput);
+    const classPrediction = prediction[0].className;
+    labelContainer.childNodes[0].innerHTML = classPrediction;
+    if (classPrediction == "Bad posture"){
+        console.log("bad");
+        x.play();
+    }
+    if (classPrediction == "Good posture"){
+        console.log("good");
+    }
+    //  for (let i = 0; i < maxPredictions; i++) {
+    //      const classPrediction =
+    //          prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+    //      labelContainer.childNodes[i].innerHTML = classPrediction;
+    //  }
 
      // finally draw the poses
      drawPose(pose);
